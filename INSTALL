@@ -1,0 +1,4 @@
+Install pgoapi somewhere (e.g. /opt/pgoapi)
+Update poke.pl to contain the pgoapi path.
+Copy pgoapi2.py into the pgoapi directory (and set execute permissions).
+Copy poke.pl to your cgi-bin directory (and set execute permissions).

@@ -1,0 +1,21 @@
+.b {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-image: url('bs.png');
+  background-size: 120px 20px;
+}
+@media
+ (-webkit-min-device-pixel-ratio: 1.5), 
+ (min-resolution: 144dpi) {
+  .b {
+    background-image: url('bs@2x.png');
+  }
+}
+.b1 { background-position: 0 0; }
+.b2 { background-position: -20px 0; }
+.b3 { background-position: -40px 0; }
+.b4 { background-position: -60px 0; }
+.b5 { background-position: -80px 0; }
+.b6 { background-position: -100px 0; }

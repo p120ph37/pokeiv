@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Core jQuery features -->
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <!-- Core Bootstrap 3 -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Core DataTables -->
+  <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+  <!-- Bootstrap style for DataTables -->
+  <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css">
+  <!-- FixedHeader feature for DataTables -->
+  <script src="https://cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.bootstrap.min.css">
+  <!-- ColReorder feature for DataTables -->
+  <script src="https://cdn.datatables.net/colreorder/1.3.2/js/dataTables.colReorder.min.js"></script>
+  <!-- Fonts -->
+  <!-- Open Sans uses monospace numerals... -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
+  <!-- Sprites -->
+  <link rel="stylesheet" href="ps.css">
+  <link rel="stylesheet" href="bs.css">
+  <!-- Stats -->
+  <script src="p-stat.js"></script>
+  <script src="cp-stat.js"></script>
+  <!-- App -->
+  <style>
+    html, body { font-family: 'Open Sans', sans-serif; }
+    .dataTable td.num { text-align: right; font-family: 'Open Sans', monospace; }
+  </style>
+  <script>
+<!--
+$(function(){
+  $('#data').DataTable({
+    paging: false,
+    fixedHeader: true,
+    colReorder: true,
+    columns: [
+      {title: 'ID', data: 'pokemon_id', type: 'num', className: 'num', width: '4em',
+        render: function(d, t, r) {
+          return t === 'display' ? '<div class="pull-left p p'+d+'"></div>'+('00' + d).substr(-3) : d;
+        }
+      },
+      {title: 'CP', data: 'cp', type: 'num', className: 'num', width: '3em'},
+      {title: 'Lv', type: 'num', className: 'num', width: '1em',
+        data: function(r) {
+          for(var i = 0; i < cpStat.length; i++) {
+            if(r.cp_multiplier < cpStat[i]) {
+              return i + 0.5;
+            } else if(r.cp_multiplier == cpStat[i]) {
+              return i + 1;
+            }
+          } 
+        },
+        render: function(d, t, r) {
+          return t === 'display' && d.toFixed(1);
+        }
+      },
+      {title: 'B', type: 'num', className: 'num', width: '1em', defaultContent: '0',
+        data: function(r) {
+          return r.from_fort ? 5 : r.pokeball ? r.pokeball : 6; 
+        },
+        render: function(d, t, r) {
+          return t === 'display' ? '<div class="b b'+d+'"></div>' : d;
+        }
+      },
+      {title: 'Name', data: 'nickname', defaultContent: '',
+        render: function(d, t, r) {
+          return t === 'display' && d == null ? '<i class="text-muted">'+pStat[r.pokemon_id-1].name+'</i>' : d;
+        }
+      },
+      {title: 'iv*', defaultContent: 0, type: 'num', className: 'num', width: '2em',
+        data: function(r) {
+          return (r.individual_attack || 0) + (r.individual_defense || 0) + (r.individual_stamina || 0);
+        }
+      },
+      {title: 'ivA', data: 'individual_attack', defaultContent: 0, type: 'num', className: 'num', width: '2em',
+//        render: function(d, t, r) {
+//          var n = ('  '+pStat[r.pokemon_id-1].attack).substr(-3).replace(' ', '&#8199;');
+//          return t === 'display' ? '<i class="text-muted pull-left">'+n+' + </i>'+(d || 0) : d;
+//        }
+      },
+      {title: 'ivD', data: 'individual_defense', defaultContent: 0, type: 'num', className: 'num', width: '2em'},
+      {title: 'ivS', data: 'individual_stamina', defaultContent: 0, type: 'num', className: 'num', width: '2em'},
+      {title: 'Atk', defaultContent: 0, type: 'num', className: 'num', width: '2em',
+        data: function(r) {
+          return Math.floor(((pStat[r.pokemon_id-1].attack + (r.individual_attack || 0)) * r.cp_multiplier));
+        }
+      },
+      {title: 'Def', defaultContent: 0, type: 'num', className: 'num', width: '2em',
+        data: function(r) {
+          return Math.floor(((pStat[r.pokemon_id-1].defense + (r.individual_defense || 0)) * r.cp_multiplier));
+        }
+      },
+//      {title: 'Sta', defaultContent: 0, type: 'num', className: 'num', width: '2em',
+//        data: function(r) {
+//          return Math.floor(((pStat[r.pokemon_id-1].stamina + (r.individual_stamina || 0)) * r.cp_multiplier));
+//        }
+//      },
+      {title: 'HP', data: 'stamina_max', type: 'num', className: 'num', width: '2em'},
+      {title: 'Date', width: '8em', className: 'num',
+        data: function(r) {
+          var d = new Date(r.creation_time_ms);
+          return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear()+' '+d.toTimeString().substr(0, 8);
+        }
+      },
+    ],
+  });
+  // Fixup the layout
+  $('#data_wrapper .col-sm-6:first').removeClass('col-sm-6').addClass('col-sm-9').append($('#login'));
+  $('#data_wrapper .col-sm-6:first').removeClass('col-sm-6').addClass('col-sm-3');
+  $('#data_wrapper .row:last').addClass('hidden');
+  $('#login').on('submit', function(event){
+    event.preventDefault();
+    $.ajax({
+      method: 'POST',
+      url: '/cgi-bin/poke.pl',
+      data: $(this).serialize(),
+      dataType: 'json',
+      success: function(data) {
+        $('#data').DataTable().clear().rows.add(data).draw();
+      },
+      error: function(xhr, err) {
+        alert(err);
+      }
+    });
+  });
+});
+//-->
+  </script>
+</head>
+<body>
+<div class="container">
+<form id="login" class="form-inline">
+  <div class="form-group">
+    <select class="form-control" name="a">
+      <option value="google">Google</option>
+      <option value="ptc">Pok&eacute;mon</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <input type="text" class="form-control" name="u" placeholder="Username">
+  </div>
+  <div class="form-group">
+    <input type="password" class="form-control" name="p" placeholder="Password">
+  </div>
+  <div class="form-group">
+    <input class="btn btn-default" type="submit" value="Load">
+  </div>
+</form>
+<table id="data" class="table table-bordered"></table>
+<ul>
+ <li><a href="http://pokemongo.gamepress.gg/pokemon-stats-advanced">Stat Calculations Explained</a></li>
+ <li><a href="https://gist.github.com/anonymous/540700108cf0f051e11f70273e9e2590">Base Stats</a></li>
+ <li><a href="http://pokemongo.gamepress.gg/power-up-costs">Power Up Costs</a></li>
+ <li><a href="http://pokemongo.gamepress.gg/cp-multiplier">Multipliers per Level</a></li>
+ <li><a href="email:me@ameriwether.com">Email me if you must...</a></li>
+</ul>
+</div>
+</body>
+</html>
